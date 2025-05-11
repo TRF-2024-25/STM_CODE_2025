@@ -74,7 +74,7 @@ void absolute(int *value) {
 void dis_cal() {
 
 	// if (ARdistance > 0.0) {
-//	ARdistance = 5;
+	ARdistance = 5;
 	RPM_set_lower =(isthreepointer) ?(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 200)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 200) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 200) :2900;
 	RPM_set_lower = constrain(RPM_set_lower, 0, 3200);
 	RPM_set_upper =(isthreepointer) ?(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 220)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 220) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 220) :900;
@@ -155,17 +155,17 @@ void rpm_cal() {
 		counter_5 = TIM3->CNT;
 		counter_8 = TIM5->CNT;
 
-//		counter_8 = counter_8 / 4;
-//		rpm1 = (counter_8 *60000)/(360*((int32_t)HAL_GetTick()-prev_loco));
-//
-//		counter_5 = counter_5 / 4;
-//		rpm2 = (counter_5 *60000)/(600*((int32_t)HAL_GetTick()-prev_loco));
-
 		counter_8 = counter_8 / 4;
-		rpm1 = (counter_8 *60000)/(600*((int32_t)HAL_GetTick()-prev_loco));
+		rpm1 = (counter_8 *60000)/(360*((int32_t)HAL_GetTick()-prev_loco));
 
 		counter_5 = counter_5 / 4;
-		rpm2 = (counter_5 *60000)/(360*((int32_t)HAL_GetTick()-prev_loco));
+		rpm2 = (counter_5 *60000)/(600*((int32_t)HAL_GetTick()-prev_loco));
+
+//		counter_8 = counter_8 / 4;
+//		rpm1 = (counter_8 *60000)/(600*((int32_t)HAL_GetTick()-prev_loco));
+//
+//		counter_5 = counter_5 / 4;
+//		rpm2 = (counter_5 *60000)/(360*((int32_t)HAL_GetTick()-prev_loco));
 
 		counter_4 = counter_4 / 4;
 		rpm3 =(counter_4 *60000)/(360*((int32_t)HAL_GetTick() -prev_loco));

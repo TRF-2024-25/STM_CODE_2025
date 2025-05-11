@@ -37,11 +37,13 @@ void dribble() {
 
 		if (HAL_GetTick() - prevmillis_d >= 50) {
 			error_d = dribble_sp - temp_pot;
-			(error_d >= 0) ?HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0) :HAL_GPIO_WritePin(dirPort_d, dirPin_d, 1);
-			kart = abs(error_d);
+			(error_d >= 0) ?
+					HAL_GPIO_WritePin(dirPort_d, dirPin_d, 1) :
+					HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
+//			kart = abs(error_d);
 			if (abs(error_d) <= 30) {
 
-				TIM12->CCR2 = 0;
+				TIM2->CCR1 = 0;
 				dalay(500);
 				switch (count) {
 //				case 2:
@@ -58,22 +60,23 @@ void dribble() {
 //					Dribble_Ext = false;
 //					break;
 //					}
-				case 1:
-//					if (dribble_sp == madhe) {
-					// Serial.println(count);
+				case 2:
 					dribble_sp = var;
-					temp_pot = analogRead_pa4();
-//					prev_error_pot = 0;
-//					error_d = dribble_sp - temp_pot;
-//					count = 2;
-
 					flag_amkette = true;
 					f_dribble = false;
 					fOperation = 0;
 					count = 0;
+					break;
+
+				case 1:
+					dribble_sp = khali;
+					temp_pot = analogRead_pa4();
+					prev_error_pot = 0;
+					error_d = dribble_sp - temp_pot;
+					count = 2;
 
 					break;
-//					}
+
 				case 0:
 
 //					if (dribble_sp == var) {
@@ -82,7 +85,7 @@ void dribble() {
 					dalay(1000);
 					HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
 					HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
-					dribble_sp = khali;
+					dribble_sp = madhe;
 					temp_pot = analogRead_pa4();
 					error_d = dribble_sp - temp_pot;
 					count = 1;
@@ -100,9 +103,10 @@ void dribble() {
 				} else {
 					integral_d = 0;
 				}
-				pwm_dribble = 12000 + (error_d * kp_d) + kd_d * (error_d - prev_error_pot) + ki_d * integral_d; // + 0.014 * (error_d - prev_error_pot) + 0.001 * (integral);
+				pwm_dribble = 12000 + (error_d * kp_d)
+						+ kd_d * (error_d - prev_error_pot) + ki_d * integral_d; // + 0.014 * (error_d - prev_error_pot) + 0.001 * (integral);
 				pwm_dribble = constrain(pwm_dribble, 0, 65535);
-				TIM12->CCR2 = pwm_dribble;
+				TIM2->CCR1 = pwm_dribble;
 //        analogWrite(pwmpin_d, pwm_dribble);
 			}
 			prevmillis_d = HAL_GetTick();

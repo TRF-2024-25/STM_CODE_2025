@@ -6,7 +6,6 @@
  */
 
 char Rx_data[20];
-
 char Ar_data[29];
 char Mp_data[3];
 #ifndef SRC_VARIABLES_H_
@@ -74,18 +73,18 @@ char angleString[8];
 // float kd2 = 0.18;
 // float kd3 = 0.1;
 
-//float kp1 = 0.3;
-//float kp2 = 0.7;
-//float kp3 = 0.3;
-//float kd1 = 0.04;
-//float kd2 = 0.09;
-//float kd3 = 0.05;
-float kp1 = 0.4;
-float kp2 = 0.8;
-float kp3 = 0.6;
+float kp1 = 0.3;
+float kp2 = 0.3;
+float kp3 = 0.4;
 float kd1 = 0.04;
-float kd2 = 0.04;
-float kd3 = 0.1;
+float kd2 = 0.09;
+float kd3 = 0.05;
+//float kp1 = 0.4;
+//float kp2 = 0.8;
+//float kp3 = 0.6;
+//float kd1 = 0.04;
+//float kd2 = 0.04;
+//float kd3 = 0.1;
 float bpbno1 = 0.45;
 float kpbno2 = 0.8;
 float kpbno3 = 0.4;
@@ -165,20 +164,18 @@ float preverror3 = 0;
 
 // DRIBBLING
 
-#define pwmPort_d
-#define pwmPin_d
 
-#define retractUpper_Port GPIOD
-#define retractUpper_Pin GPIO_PIN_3
+#define retractUpper_Port GPIOC
+#define retractUpper_Pin GPIO_PIN_8
 
 #define extendLower_Port GPIOD
-#define extendLower_Pin GPIO_PIN_1
+#define extendLower_Pin GPIO_PIN_3
 
 #define extendUpper_Port GPIOA
 #define extendUpper_Pin GPIO_PIN_8
 
-#define retractLower_Port GPIOC
-#define retractLower_Pin GPIO_PIN_8
+#define retractLower_Port GPIOD
+#define retractLower_Pin GPIO_PIN_1
 
 #define pistonUp_Port GPIOD
 #define pistonUp_Pin GPIO_PIN_7
@@ -186,8 +183,8 @@ float preverror3 = 0;
 #define pistonDown_Port GPIOB
 #define pistonDown_Pin GPIO_PIN_4
 
-#define dirPort_d GPIOB
-#define dirPin_d GPIO_PIN_13
+#define dirPort_d GPIOD
+#define dirPin_d GPIO_PIN_0
 
 
 // ROTORS VARIABLES
@@ -198,8 +195,6 @@ float preverror3 = 0;
 #define DirMUpper 28
 #define PwmMLower 8
 #define PwmMUpper 7
-#define pistonUp 37
-#define pistonDown 39
 int shootcount =0;
 int sampling = 80;
 volatile int Rpm_set_lower = 0;
@@ -291,9 +286,9 @@ void dalay(int);
 
 int interval_d = 50;
 
-#define var 1615
-#define madhe 1974
-#define khali 3700
+#define var 1450
+#define madhe 1777
+#define khali 3600
 int integral_d = 0;
 long integral = 0;
 unsigned long prevmillis_d = 0;
