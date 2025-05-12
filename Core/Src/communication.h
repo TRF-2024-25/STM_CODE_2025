@@ -28,9 +28,19 @@ int Rxvalueslo(char *Rx_data){
 			if (strengthX - strengthc >30) {
 				strengthX -= (strengthX - strengthc) * 0.89;
 			 } else if (strengthX - strengthc < -30) {
+
+				       if((int)(angle - Z_Val ) %360 > 140 && (int)(angle - Z_Val ) %360 < 220)
+
+				       {
+				    	   strengthX -= (strengthX - strengthc) * 0.97;
+				       }
+				       else
+				       {
+
 					   strengthX -= (strengthX - strengthc) * 0.90;
+		 	     }
 			 }
-			 strengthc = strengthX;
+		  	 strengthc = strengthX;
 					strength = strengthX;
 					   strengthsampling = HAL_GetTick();
 					 }
@@ -39,6 +49,7 @@ int Rxvalueslo(char *Rx_data){
 
 	}
 }
+
 int Arvalueslo(char *Ar_data){
    if(Ar_data!= NULL){
 	   strncpy(disString,Ar_data +6,7);

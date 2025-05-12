@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "main.h"
+#include "main.h"
 //#include "jsonparsergargi.h"
 #include "bno055_stm32.h"
 #include "rotors.h"
@@ -151,10 +151,8 @@ int main(void)
 
   /* MCU Configuration--------------------------------------------------------*/
 
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -446,9 +444,7 @@ int main(void)
 			locomote();
 			break;
 		case 'R':
-			if (!alignn) {
-			alignn = true;
-			}
+
 			locomotion();
 			locomote();
 			break;

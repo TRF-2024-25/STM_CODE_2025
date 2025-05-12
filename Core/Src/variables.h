@@ -73,9 +73,9 @@ char angleString[8];
 // float kd2 = 0.18;
 // float kd3 = 0.1;
 
-float kp1 = 0.3;
-float kp2 = 0.3;
-float kp3 = 0.4;
+float kp1 = 0.4;
+float kp2 = 0.756;
+float kp3 = 0.3;
 float kd1 = 0.04;
 float kd2 = 0.09;
 float kd3 = 0.05;

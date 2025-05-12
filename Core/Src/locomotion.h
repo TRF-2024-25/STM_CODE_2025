@@ -9,8 +9,8 @@
 #define SRC_LOCOMOTION_H_
 #include "variables.h"
 #include "alignment.h"
-void calc();
-void locomote();
+//void calc();
+//void locomote();
 double toradian(double x) {
   return x * pi / 180;
 }
@@ -76,12 +76,12 @@ void locomotion() {
       // strength = (rotationstrength>)
 
     case 'k':
-      w = -1.1;
+      w = -0.9;
       calc();
 
       break;
     case 'K':
-      w = 1.1;
+      w = 0.9;
 
       calc();
 
@@ -138,8 +138,8 @@ void locomote() {
   setpoint2= (setpoint2 < 0)?(~setpoint2)+ 1: setpoint2;
   setpoint3 =(setpoint3 < 0)?(~setpoint3)+ 1: setpoint3;
   basepwm[0] = base[0] * 1000;
-  basepwm[1] = base[1] * 1000;
-  basepwm[2] = base[2] * 1050;
+  basepwm[1] = base[1] * 1050;
+  basepwm[2] = base[2] * 980;
 
   basepwm[0] = (basepwm[0]<0)?(~basepwm[0]) + 1:basepwm[0];
   basepwm[1] = (basepwm[1]<0)?(~basepwm[1]) + 1:basepwm[1];
