@@ -5,16 +5,20 @@
  *      Author: Harsh
  */
 
-char Rx_data[20];
-char Ar_data[29];
-char Mp_data[3];
+
 #ifndef SRC_VARIABLES_H_
 #define SRC_VARIABLES_H_
 
 #include "stdio.h"
 #include <stdbool.h>
 #include "string.h"
-
+char chstr;
+char oo[3];
+int gg =0;
+char Rx_data[21];
+char Ar_data[29];
+char Mp_data[3];
+char rx_data[20]={'"','{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}','"'};
 bool f_h = true;
 bool f_H = true;
 // Loco = "S000090100";
@@ -145,7 +149,8 @@ int16_t setpoint3 = 0;
 int pwm1 = 0;
 int pwm2 = 0;
 int pwm3 = 0;
-char loco = 'S', com = 'S';
+char loco = 'S';
+com = 'S';
 char lococ;
 float error1 = 0;
 float error2 = 0;
@@ -215,7 +220,7 @@ int baseLower = 0;
 int baseUpper = 0;
 float ARdistance = 1;
 int a =0;
-bool Rotors_flag = 0;
+bool Rotors_flag = 1;
 bool isthreepointer = true;
 
 //Autolocomote

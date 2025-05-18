@@ -75,9 +75,9 @@ void dis_cal() {
 
 	// if (ARdistance > 0.0) {
 	ARdistance = 5;
-	RPM_set_lower =(isthreepointer) ?(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160) :2900;
+	RPM_set_lower =2850;//(isthreepointer) ?(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4 - 160) :2900;
 	RPM_set_lower = constrain(RPM_set_lower, 0, 3200);
-	RPM_set_upper =(isthreepointer) ?(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190) :900;
+	RPM_set_upper =2200;//(isthreepointer) ?(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8 - 190) :900;
 	RPM_set_upper = constrain(RPM_set_upper, 0, 3200);
 	lower_base = 17.2*RPM_set_lower + 4088.9+1400;
 	upper_base = 16.877*RPM_set_upper + 5313.2+1000;

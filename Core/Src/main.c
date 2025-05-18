@@ -110,7 +110,7 @@ char rx_buff[21];
 
 float z = 0;
 int u = 0;
-bno055_vector_t v;
+
 
 //uint32_t prev=0;
 
@@ -125,8 +125,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 //	if (huart == &huart2)
 //		HAL_UART_Receive(&huart2, Ar_data, 29,10);
-	if (huart == &huart5)
+	if (huart == &huart5){
 		HAL_UART_Receive_DMA(&huart5, Rx_data, 20);
+	}
 	else if (huart == &huart4) {
 		HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
 	}
@@ -201,14 +202,14 @@ int main(void)
 	HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
 	HAL_UART_Receive_DMA(&huart2, Ar_data, 29);
 
-	bno055_assignI2C(&hi2c1);
-	bno055_setup();
-	HAL_Delay(200);
-	bno055_setOperationModeNDOF();
-	if (hi2c1.State != HAL_I2C_STATE_READY) {
-		HAL_I2C_DeInit(&hi2c1);
-		HAL_I2C_Init(&hi2c1);
-	}
+//	bno055_assignI2C(&hi2c1);
+//	bno055_setup();
+//	HAL_Delay(200);
+//	bno055_setOperationModeNDOF();
+//	if (hi2c1.State != HAL_I2C_STATE_READY) {
+//		HAL_I2C_DeInit(&hi2c1);
+//		HAL_I2C_Init(&hi2c1);
+//	}
 	HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
 	HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
 	HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 1);
@@ -254,6 +255,10 @@ int main(void)
 		Mpuvalueslo(&Mp_data);
 		Arvalueslo(&Ar_data);
 		Rxvalueslo(&Rx_data);
+strncpy(oo, Rx_data + 10,12);
+oo[12] = '\0';
+//gg = atoi(oo);
+sscanf(oo, "%d", &gg);
 		dribble();
 		rotors(Rotors_flag);
 
@@ -270,28 +275,7 @@ int main(void)
 			locomotion();
 			locomote();
 			break;
-		case 'b':
-			//		      digitalWrite(dir_motor[0], 0);
-			//		      digitalWrite(dir_motor[1], 0);
-			//		      digitalWrite(dir_motor[2], 0);
-			//
-			//		      analogWrite(pwm_motor[0], 0);
-			//		      analogWrite(pwm_motor[1], 45);
-			//		      analogWrite(pwm_motor[2], 45);
-			// locomotion();
-			// locomote();
-			break;
-		case 'f':
-			//		      digitalWrite(dir_motor[0], 0);
-			//		      digitalWrite(dir_motor[1], 1);
-			//		      digitalWrite(dir_motor[2], 1);
-			//
-			//		      analogWrite(pwm_motor[0], 0);
-			//		      analogWrite(pwm_motor[1], 40);
-			//		      analogWrite(pwm_motor[2], 40);
-			// locomotion();
-			// locomote();
-			break;
+
 		case 'K':
 			if (!alignn) {
 				alignn = true;

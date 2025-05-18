@@ -10,9 +10,54 @@
 
 #include "variables.h"
 #include "cJSON.h"
+//int Rxvalueslo(char *Rx_data){
+////	if(Rx_data!=NULL && Rx_data[1] =='{'){
+//		a++;
+//		loco = Rx_data[8];
+//		char Rotate[4];
+//		strncpy(Rotate, Rx_data +9, 3);
+//		rotationstrength = atoi(Rotate);
+//		char Angle[4];
+//		strncpy(Angle, Rx_data +12, 3);
+//		angle = atoi(Angle);
+////		angle = (angle == 400) ? 400 : (angle + 180) % 360;
+//
+//		char Strength[4];
+//		strncpy(Strength, Rx_data +15, 3);
+//		strengthX = atoi(Strength);
+//		 if ((int32_t)HAL_GetTick() - strengthsampling > 30) {
+//			if (strengthX - strengthc >30) {
+//				strengthX -= (strengthX - strengthc) * 0.89;
+//			 } else if (strengthX - strengthc < -30) {
+//
+//				       if((int)(angle - Z_Val ) %360 > 140 && (int)(angle - Z_Val ) %360 < 220)
+//
+//				       {
+//				    	   strengthX -= (strengthX - strengthc) * 0.97;
+//				       }
+//				       else
+//				       {
+//
+//					   strengthX -= (strengthX - strengthc) * 0.90;
+//		 	     }
+//			 }
+//		  	 strengthc = strengthX;
+//					strength = strengthX;
+//					   strengthsampling = HAL_GetTick();
+//					 }
+//					 strength  = constrain(strength,0,85);
+//
+//
+////	}
+//}
+
+
 int Rxvalueslo(char *Rx_data){
-	if(Rx_data!=NULL && Rx_data[0] =='{'){
-		loco = Rx_data[8];
+//	if(Rx_data!=NULL && Rx_data[1] =='{'){
+		a++;
+		loco = Rx_data[9];
+		chstr = Rx_data[8];
+
 		char Rotate[4];
 		strncpy(Rotate, Rx_data +9, 3);
 		rotationstrength = atoi(Rotate);
@@ -47,7 +92,7 @@ int Rxvalueslo(char *Rx_data){
 					 strength  = constrain(strength,0,85);
 
 
-	}
+//	}
 }
 
 int Arvalueslo(char *Ar_data){
