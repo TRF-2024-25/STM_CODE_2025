@@ -12,10 +12,8 @@
 #include "stdio.h"
 #include <stdbool.h>
 #include "string.h"
-char chstr;
-char oo[3];
-int gg =0;
-char Rx_data[21];
+
+char Rx_data[20];
 char Ar_data[29];
 char Mp_data[3];
 char rx_data[20]={'"','{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}','"'};
@@ -98,6 +96,31 @@ float kdbno3 = 0.01;
 float errorbno =0;
 float previouserrorbno =0;
 uint32_t prevviousmillisbno =0;
+float radiantopwm = 1075.2;
+float rpmtoradian = 9.549;
+float base1multiplier  = 1000;
+float base2multiplier =   1050;
+float base3multiplier = 980;
+float joystickwconstant = 1.2;
+int defaultcontrollerangle = 400;
+float kcasew = 0.9;
+float ocasew = 0.7;
+int upperlimitlocomotionconstant = 45000;
+float nextanglesetpointalignmentconstant = 1.6;
+float alignmentinitialdeltamultiplier = 0.05;
+float alignmentsetpoint =2;
+int alignmentsamplingtime =20;
+float active_ki_for_alignment_range = 10;
+float PID_IN_ALIGNMENT_RANGE = 120;
+int maxalignmentintegralconstant = 100;
+float alignment_base_w = 0.2;
+float w_limit_for_alignment = 2.0;
+int strength_effective_for_deceleration_acceleration_constant = 30;
+int decleration_acceleration_sampling = 30;
+float acceleration_constant = 0.89;
+float deceleration_constant = 0.90;
+int max_strength_set = 85;
+
 
 bool Dribble_Ext = false;
 
@@ -149,8 +172,7 @@ int16_t setpoint3 = 0;
 int pwm1 = 0;
 int pwm2 = 0;
 int pwm3 = 0;
-char loco = 'S';
-com = 'S';
+char loco = 'S', com = 'S';
 char lococ;
 float error1 = 0;
 float error2 = 0;
@@ -222,6 +244,7 @@ float ARdistance = 1;
 int a =0;
 bool Rotors_flag = 1;
 bool isthreepointer = true;
+
 
 //Autolocomote
 float target_auto = 7;

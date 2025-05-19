@@ -1,16 +1,3 @@
-/*
- * alignment.h
- *
- *  Created on: May 2, 2025
- *      Author: Harsh
- */
-/*
- * alignment.h
- *
- *  Created on: May 1, 2025
- *      Author: HP
- */
-
 #ifndef SRC_ALIGNMENT_H_
 #define SRC_ALIGNMENT_H_
 
@@ -30,17 +17,16 @@ bool align(float target) {
 
   s = delta;
   if (initialdelta < 0) {
-    if (delta > -1.6 + initialdelta*0.05 && delta < 1.6) {
+    if (delta > -nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier && delta < nextanglesetpointalignmentconstant) {
       donealign = true;
     }
   } else {
-    if (delta > -1.6 && delta < 1.6 + initialdelta*0.05) {
+    if (delta > -nextanglesetpointalignmentconstant && delta < nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier) {
       donealign = true;
     }
   }
-  // if (abs(delta) < 1) {
   if (donealign) {
-	if(delta < 2 && delta >-2){
+	if(delta < alignmentsetpoint && delta >-alignmentsetpoint){
     w = 0;
     alignn = true;
     integralalign = 0;
@@ -52,39 +38,35 @@ bool align(float target) {
 		return false;
 	}
   }
-  if (HAL_GetTick() - previousalignsampling > 20) {
+  if (HAL_GetTick() - previousalignsampling > alignmentsamplingtime) {
 
-    if (s< 120.0 && s > -120.0) {
-      if (s < 10.0 && s > -10.0) {
+    if (s< PID_IN_ALIGNMENT_RANGE && s > -PID_IN_ALIGNMENT_RANGE) {
+      if (s < active_ki_for_alignment_range && s > -active_ki_for_alignment_range) {
         integralalign += s;
-        if (integralalign > 100) {
-          integralalign = 100.0;
+        if (integralalign > maxalignmentintegralconstant) {
+          integralalign = maxalignmentintegralconstant;
         }
       }
       else{
          integralalign = 0;
       }
-
-      // w = (s < 0) ? s * 0.02 + (s - previousS) * 0.089 + 0.0000018*integralalign  : (s * 0.02  + (s - previousS) * 0.089 + 0.0000018*integralalign );
       errordiff_align = s - previousS;
       if (s < 0) {
-        w_align = kp_align * s + kd_align * errordiff_align + ki_align * integralalign - 0.2;
+        w_align = kp_align * s + kd_align * errordiff_align + ki_align * integralalign - alignment_base_w;
       } else {
-        w_align = kp_align * s + kd_align * errordiff_align + ki_align * integralalign + 0.2;
+        w_align = kp_align * s + kd_align * errordiff_align + ki_align * integralalign + alignment_base_w;
       }
 
-      w_align = constrain_float(w_align, -2, 2);
+      w_align = constrain_float(w_align, -w_limit_for_alignment, w_limit_for_alignment);
       w = w_align;
     } else {
-      w = (s < 0) ? -2 : 2;
+      w = (s < 0) ? -w_limit_for_alignment : w_limit_for_alignment;
     }
     w = -w;
     previousalignsampling = HAL_GetTick();
     previousS = s;
   }
-  // Serial.print("::");
-  // Serial.print(w);
-//   digitalWrite(A14,0);
+
   return false;
 }
 
