@@ -21,40 +21,45 @@ uint16_t analogRead_pa4() {
 }
 
 void dribble() {
-	temp_pot = analogRead_pa4();
+	pot_val = analogRead_pa4();
 
 	if (!f_dribble) {
 		return;
 	}
 
-	if (HAL_GetTick() - prevmillis_d >= 50) {
-		error_d = dribble_sp - temp_pot;
+	if (HAL_GetTick() - prevmillis_d >= sampling) {
+		error_d = dribble_sp - pot_val;
 		(error_d >= 0) ?
 				HAL_GPIO_WritePin(dirPort_d, dirPin_d, 1) :
 				HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
 
-		if (abs(error_d) <= 30) {
+		if (abs(error_d) <= 20) {
 
 			TIM10->CCR1 = 0;
-			dalay(500);
+			while_delay(250);
 			switch (count) {
+			case -1:
+				dribble_sp = var;
+				f_dribble = false;
+				count = 0;
+				break;
 			case 0:
 
-				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+//				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
 				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
-				dalay(1000);
-				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+				while_delay(100);
+//				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
 				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
 				dribble_sp = madhe;
-				temp_pot = analogRead_pa4();
-				error_d = dribble_sp - temp_pot;
+				pot_val = analogRead_pa4();
+				error_d = dribble_sp - pot_val;
 				count = 1;
 				break;
 			case 1:
 				dribble_sp = khali;
-				temp_pot = analogRead_pa4();
+				pot_val = analogRead_pa4();
 				prev_error_pot = 0;
-				error_d = dribble_sp - temp_pot;
+				error_d = dribble_sp - pot_val;
 				count = 2;
 
 				break;
@@ -62,8 +67,14 @@ void dribble() {
 				dribble_sp = var;
 				flag_amkette = true;
 				f_dribble = false;
-				fOperation = 0;
 				count = 0;
+				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
+				HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 1);
+				while_delay(200);
+				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
+				HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 0);
 				break;
 
 			default:
@@ -90,98 +101,7 @@ void dribble() {
 
 }
 
-// void dribble() {
-
-//   if (f_dribble == true) {
-//     if (digitalRead(proxy) == 0 && fOperation == 1) {
-//       fOperation = 2;
-//     } else if (fOperation == 2 && digitalRead(proxy) == 1) {
-//       digitalWrite(retractLower, 1);
-//       digitalWrite(retractUpper, 1);
-//       dalay(100);
-//       digitalWrite(retractLower, 0);
-//       digitalWrite(retractUpper, 0);
-//       fOperation = 3;
-//       f_dribble = false;
-//       Serial.println("dribble22222222222222222");
-//     }
-//   } else if (fOperation == 3) {
-//     f_power = true;
-//     Serial.print(" -set vaR sp- ");
-//     dribble_sp = var;
-//     fOperation = 4;
-//   }
-// }
-
-// void power() {
-//   if (f_power == true) {
-//     Serial.println(" FPOWER TRUE ");
-//     Window();
-//     if (sp_reached) {
-//       Serial.print(" spf ");
-//       Serial.print(dribble_sp);
-//       if (count == 1) {
-//         Serial.print(" madhe sp ");
-//         dribble_sp = madhe;
-//         dalay(500);
-//         sp_reached = false;
-//       }
-//       if (count == 2) {
-//         win_flag = 0;
-//         while (digitalRead(A11) == 1) {
-//           analogWrite(pwmpin_d, 140);
-//         }
-//         analogWrite(pwmpin_d, 0);
-//         dribble_sp = khali;
-//         f_power = false;
-//         sp_reached = false;
-//         fOperation = 0;
-//         f_dribble = false;
-//         count = 0;
-//         win_flag = 1;
-//         sp_reached = false;
-//       }
-//     }
-//   }
-// }
-// void Window() {
-//   if (win_flag) {
-//     temp_pot = analogRead(pot);
-//     error_pot = dribble_sp - temp_pot;
-//     Serial.print(" err ");
-//     Serial.println(abs(error_pot));
-//     if (error_pot > 0) digitalWrite(dir_d, 1);
-//     else digitalWrite(dir_d, 0);
-
-//     if (abs(error_pot) < 30) {
-//       Serial.println(" sp reached ");
-//       sp_reached = true;
-//       analogWrite(pwmpin_d, 0);
-//       Serial.println("increment ctr");
-//       count++;
-//       if (count == 3) {
-//         Serial.println(" reset all ");
-//         f_power = false;
-//         sp_reached = false;
-//         fOperation = 0;
-//         f_dribble = false;
-//         count = 0;
-//         return;
-//       }
-//       return;
-//     } else {
-//       // pwm_dribble = 30 + error_pot * 0.4 + 0.01 * (error_pot - prev_error_pot);
-//       pwm_dribble = 170;
-//       pwm_dribble = constrain(pwm_dribble, 0, 200);
-//       analogWrite(pwmpin_d, pwm_dribble);
-//       Serial.print(" pass pwm ");
-//       Serial.println(pwm_dribble);
-//     }
-//     prev_error_pot = error_pot;
-//   }
-// }
-
-void dalay(int d) {
+void while_delay(int d) {
 	unsigned long prevmillis1 = HAL_GetTick();
 	while (HAL_GetTick() - prevmillis1 <= d) {
 		// dribble();
@@ -194,3 +114,4 @@ void dalay(int d) {
 }
 
 #endif /* SRC_DRIBBLE_H_ */
+

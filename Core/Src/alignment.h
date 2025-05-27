@@ -16,6 +16,13 @@ bool align(float target) {
 
 
   s = delta;
+  alignmentsetpoint = (fromlocomotion)?5:2;
+  if(fromlocomotion){
+	  if(delta < alignmentsetpoint && delta > -alignmentsetpoint){
+		  donealign = true;
+	  }
+  }
+  else{
   if (initialdelta < 0) {
     if (delta > -nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier && delta < nextanglesetpointalignmentconstant) {
       donealign = true;
@@ -24,6 +31,7 @@ bool align(float target) {
     if (delta > -nextanglesetpointalignmentconstant && delta < nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier) {
       donealign = true;
     }
+  }
   }
   if (donealign) {
 	if(delta < alignmentsetpoint && delta >-alignmentsetpoint){
@@ -62,7 +70,7 @@ bool align(float target) {
     } else {
       w = (s < 0) ? -w_limit_for_alignment : w_limit_for_alignment;
     }
-//    w = -w;
+    w = -w;
     previousalignsampling = HAL_GetTick();
     previousS = s;
   }

@@ -52,7 +52,8 @@ int dir_motor[3] = { 34, 38, 36 };  // 26 32 28
 int dir[3];
 int basepwm[3];
 int base[3];
-int multi = 2.8;
+int multi = 3.2;
+bool fromlocomotion = false;
 bool ballpickup = false;
 float x;
 float y;
@@ -70,12 +71,12 @@ char disString[8];
 char angleString[8];
 //kartik
 float kp1 = 0.5;//0.14
-float kp2 = 0.5;// 0.31
-float kp3 = 0.5;//0.4
+float kp2 = 0.65;// 0.31
+float kp3 = 0.55;//0.4
 
 float kd1 = 0.04;//0.0
-float kd2 = 0.04;// 0.024
-float kd3 = 0.04;// 0.02
+float kd2 = 0.05;// 0.024
+float kd3 = 0.03;// 0.02
 
 //float kp1 = 0.5;//0.4;
 //float kp2 = 0.45;//0.756;
@@ -102,20 +103,24 @@ float kd3 = 0.04;// 0.02
 //float kd1 = 0.04;
 //float kd2 = 0.04;
 //float kd3 = 0.1;
-float bpbno1 = 0.45;
-float kpbno2 = 0.8;
-float kpbno3 = 0.4;
-float kdbno1 = 0.01;
-float kdbno2= 0.01;
-float kdbno3 = 0.01;
-float errorbno =0;
-float previouserrorbno =0;
+float kpbno1 = 120;
+float kpbno2 = 120;
+float kpbno3 = 120;
+float kdbno1 = 8;
+float kdbno2= 8;
+float kdbno3 = 8;
+float bnoerror =0;
+int bno1pid =0;
+int bno2pid =0;
+int bno3pid =0;
+float previousbnoerror =0;
+int bnosetpoint =0;
 uint32_t prevviousmillisbno =0;
 float radiantopwm = 1075.2;
 float rpmtoradian = 9.549;
 float base1multiplier  = 1000;
 float base2multiplier =   1000;
-float base3multiplier = 950;
+float base3multiplier = 960;
 //float base1multiplier  = 1000;
 //float base2multiplier =   990;
 //float base3multiplier = 1100;
@@ -123,7 +128,7 @@ float joystickwconstant = 1.2;
 int defaultcontrollerangle = 400;
 float kcasew = 0.9;
 float ocasew = 0.7;
-int upperlimitlocomotionconstant = 45000;
+int upperlimitlocomotionconstant = 65000;
 float nextanglesetpointalignmentconstant = 1.6;
 float alignmentinitialdeltamultiplier = 0.05;
 float alignmentsetpoint =2;
@@ -137,8 +142,8 @@ int strength_effective_for_deceleration_acceleration_constant = 30;
 int decleration_acceleration_sampling = 50;
 float acceleration_constant = 0.9;
 float deceleration_constant = 0.95;
-int max_strength_set = 85;
-
+int max_strength_set = 100;
+float prevw =0;
 
 
 
@@ -264,10 +269,10 @@ unsigned long prevtime_ = 0;
 int Rpmlower = 0, Rpmupper = 0, PwmLower = 0, PwmUpper = 0, errordiffLower = 0, errordiffUpper = 0;
 float kpLower = 11;
 float kpUpper = 24;
-float kdLower = 0.0;
-float kdUpper = 0.0;
-float kiLower = 0.0001;
-float kiUpper = 0.0001;
+//float kdLower = 0.0;
+//float kdUpper = 0.0;
+//float kiLower = 0.0001;
+//float kiUpper = 0.0001;
 bool flag_amkette=true;
 int baseLower = 0;
 int baseUpper = 0;
@@ -290,81 +295,24 @@ float prev_dis_auto=0;
 
 // DRIBBLING
 
+ bool f_dribble = true;
+ int pot_val = 0;
 
 
-// int max_d = 100;
-// int min_d = 0;
-// //// ---------r2-------////
-// long integral = 0;
-// unsigned long prevmillis_d = 0;
-// int dPistonPin = 0;
-// bool win_flag = 1;
-// // Pin Definitions
-// #define pot A11
-// #define LS A12
-// #define proxy A14
-// #define extendUpper 29
-// #define retractUpper 31
-// #define extendLower 25
-// #define retractLower 27
-// #define dir_d 32
-// #define pwmpin_d 10
-// bool firstrun = false;
-// long p =0;
-// // Control flags
-// int pwm_dribble=0;
- int  fOperation = 0;
-// String Loco,Com,str;
-// // control variables
-// float kp_d = 0;
-// float kd_d = 0.00;
-// int derivative_d = 0;
-// int basepwm_d = 170;
-// int pwm_d = 0;
-//
-// int setpoint_d = 0;
-// int potval = 0;
-// float output_d = 0;
-// float aberror_d = 0;
-// long error_d = 0;
-// int prevErr_d = 0;
-// unsigned long controlmillis1 = 0;
-// unsigned long controlmillis2 = 0;
-// int controlInter = 10;
-// // Timing Variables
- bool f_dribble = false;
- int temp_pot = 0;
-// int error_pot = 0;
-// Character Input
-// char x = 'S';
+void while_delay(int);
 
 
-//picking
-//functions
-
-
-void dalay(int);
-
-int interval_d = 50;
-
-#define var 2000
-#define madhe 2200
-#define khali 3600
+#define var 1180
+#define madhe 1300
+#define khali 2900
 int integral_d = 0;
-long integral = 0;
 unsigned long prevmillis_d = 0;
-
-// Pin Definitions
 int check=0;
-
-// flags
-bool f_pickup = true;
-int f_op = 0;
-int count = 0;
+int count = -1;
 int potval = 0;
-int dribble_sp = var;
+int dribble_sp = khali;
 int pwm_dribble = 0;
-float kp_d = 70;
+float kp_d = 50;
 float kd_d = 15;
 float ki_d = 10;
 int basepwm_d = 50;
@@ -372,7 +320,6 @@ float output_d = 0;
 float aberror_d = 0;
 int error_d = 0;
 int prevErr_d = 0;
-//picking end
 float radiann = 0;
 
 #endif /* SRC_VARIABLES_H_ */

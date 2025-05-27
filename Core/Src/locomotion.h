@@ -17,10 +17,10 @@ double toradian(double x) {
 void locomotion() {
   if (!alignn) {
     alignn = align(alignvalue);
+    fromlocomotion = false;
   }
 
   switch (loco) {
-
     case 'S':
       if (angle == defaultcontrollerangle) {
         angle = prevangle;
@@ -29,7 +29,8 @@ void locomotion() {
           w = 0;
         }
       } else {
-    	prevangle = angle;
+    	if(angle <=360){
+    	prevangle = angle ;}
         calc();
       }
       if (angle != defaultcontrollerangle) {
@@ -40,7 +41,7 @@ void locomotion() {
       break;
     case 'L':
 
-      w = -(joystickwconstant * rotationstrength) / 100;
+      w = (joystickwconstant * rotationstrength) / 100;
       if (angle == defaultcontrollerangle) {
         vx = 0;
         vy = 0;
@@ -51,7 +52,7 @@ void locomotion() {
       }
       break;
     case 'R':
-      w = (joystickwconstant * rotationstrength) / 100;
+      w = -(joystickwconstant * rotationstrength) / 100;
       if (angle == defaultcontrollerangle) {
         vx = 0;
         vy = 0;
@@ -63,12 +64,12 @@ void locomotion() {
       break;
 
     case 'K':
-      w = -kcasew ;
+      w = kcasew ;
       calc();
 
       break;
     case 'k':
-      w = kcasew ;
+      w = -kcasew ;
 
       calc();
 
@@ -102,18 +103,45 @@ void calc() {
   vy = sin(radiann) * strength / 100 * multi;
 }
 void locomote() {
+
+ if (HAL_GetTick() - previousmillis >= sampletime) {
+
+
+	  if(w!=0){
+		  bnosetpoint = Z_Val;
+		  bnoerror =0;
+		  fromlocomotion = false;
+		  prevw = w;
+	  }
+	  else if(prevw < 0.1 && prevw > -0.1){
+		  prevw =0;
+		 fromlocomotion = true;
+		 align(bnosetpoint);
+	  }
+	  else{
+		  bnosetpoint = Z_Val;
+		  prevw = prevw*0.9;
+		  w = prevw;
+	  }
   float matrix[3][3] = { { cos((0 + Z_Val) * pi / 180), sin((0 + Z_Val) * pi / 180), d },
                          { cos((120 + Z_Val) * pi / 180), sin((120 + Z_Val) * pi / 180), d },
                          { cos((240 + Z_Val) * pi / 180), sin((240 + Z_Val) * pi / 180), d } };
   base[0] = (matrix[0][0] * vx + matrix[0][1] * vy + w * matrix[0][2]) / r;
   base[1] = (matrix[1][0] * vx + matrix[1][1] * vy + w * matrix[1][2]) / r;
   base[2] = (matrix[2][0] * vx + matrix[2][1] * vy + w * matrix[2][2]) / r;
+//  bnoerror = (bnosetpoint - Z_Val) <180 ? (bnosetpoint - Z_Val) > -180 ? (bnosetpoint - Z_Val):(bnosetpoint - Z_Val + 360): (bnosetpoint - Z_Val - 360);
 
-  if ((base[0] != 0) || (base[1] != 0) || base[2] != 0) {
-    dir[0] = (base[0] < 0) ? 1: 0;
-    dir[1] = (base[1] < 0) ? 0:1;
-    dir[2] = (base[2] < 0) ? 0: 1;
-  }
+
+//  if(bnoerror <= 4 && bnoerror >= -4){
+//	  bnoerror =0;
+//  }
+//  bno1pid = basepwm[0] + kp1 * (error1) + kd1 * (error1 - preverror1) - (kpbno1 * (bnoerror) + kdbno1*(bnoerror -previousbnoerror)) ;
+//  bno2pid = basepwm[1] + kp2 * (error2) + kd2 * (error2 - preverror1) - (kpbno2 * (bnoerror) + kdbno2*(bnoerror -previousbnoerror));
+//  bno3pid = basepwm[2] + kp3 * (error3) + kd3 * (error3 - preverror1) - (kpbno3 * (bnoerror) + kdbno3*(bnoerror -previousbnoerror));
+    dir[0] = base[0] < 0 ?  0: 1;
+    dir[1] = base[1] <0  ? 1: 0;
+    dir[2] =  base[2 ]<0 ? 1: 0;
+
   setpoint1 = base[0] *  rpmtoradian;
   setpoint2 = base[1] *  rpmtoradian;
   setpoint3 = base[2] *  rpmtoradian;
@@ -129,25 +157,24 @@ void locomote() {
   basepwm[2] = (basepwm[2]<0)?(~basepwm[2]) + 1:basepwm[2];
 
 
+
   error1 = ((setpoint1 - rpm1) /  rpmtoradian) * radiantopwm;
   error2 = ((setpoint2 - rpm2) /  rpmtoradian) * radiantopwm;
   error3 = ((setpoint3 - rpm3) /  rpmtoradian) * radiantopwm;
 
-
-  if (HAL_GetTick() - previousmillis >= sampletime) {
-    pwm1 = basepwm[0] + kp1 * (error1) + kd1 * (error1 - preverror1);
-
+    pwm1 = basepwm[0] + kp1 * (error1) + kd1 * (error1 - preverror1); //- (kpbno1 * (bnoerror) + kdbno1*(bnoerror -previousbnoerror))  ;
 
     pwm1 = constrain(pwm1, 0, upperlimitlocomotionconstant);
-    pwm2 = basepwm[1] + kp2 * (error2) + kd2 * (error2 - preverror2);
+    pwm2 = basepwm[1] + kp2 * (error2) + kd2 * (error2 - preverror2); //- (kpbno1 * (bnoerror) + kdbno1*(bnoerror -previousbnoerror));
 
     pwm2 = constrain(pwm2, 0, upperlimitlocomotionconstant);
-    pwm3 = basepwm[2]+ kp3 * (error3) + kd3 * (error3 - preverror3);
+    pwm3 = basepwm[2]+ kp3 * (error3) + kd3 * (error3 - preverror3);// - (kpbno1 * (bnoerror) + kdbno1*(bnoerror -previousbnoerror)) ;
 
     pwm3 = constrain(pwm3, 0, upperlimitlocomotionconstant);
     preverror1 = error1;
     preverror2 = error2;
     preverror3 = error3;
+//    previousbnoerror = bnoerror;
     previousmillis = HAL_GetTick();
   }
 
@@ -161,20 +188,6 @@ HAL_GPIO_WritePin(GPIOB,GPIO_PIN_12,dir[0]);
 
  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, dir[2]);
   TIM2->CCR1 = pwm3;
-
-// R2 LOCOMOTION
-
-
-
-//  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_12,dir[1]);
-//  TIM12 ->CCR2 = pwm1;
-//  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13,dir[0]);
-//   TIM12->CCR1 = pwm2;
-//  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_11,dir[2]);
-//  TIM2 ->CCR3 = pwm3;
-
-
-
 
 }
 
