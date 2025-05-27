@@ -16,7 +16,7 @@
 char Rx_data[20];
 char Ar_data[29];
 char Mp_data[3];
-char rx_data[20]={'"','{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}','"'};
+char rx_data[20]={'{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}'};
 bool f_h = true;
 bool f_H = true;
 // Loco = "S000090100";
@@ -52,7 +52,7 @@ int dir_motor[3] = { 34, 38, 36 };  // 26 32 28
 int dir[3];
 int basepwm[3];
 int base[3];
-int multi = 2;
+int multi = 2.8;
 bool ballpickup = false;
 float x;
 float y;
@@ -68,6 +68,21 @@ bool isauto = false;
 //const char*
 char disString[8];
 char angleString[8];
+//kartik
+float kp1 = 0.5;//0.14
+float kp2 = 0.5;// 0.31
+float kp3 = 0.5;//0.4
+
+float kd1 = 0.04;//0.0
+float kd2 = 0.04;// 0.024
+float kd3 = 0.04;// 0.02
+
+//float kp1 = 0.5;//0.4;
+//float kp2 = 0.45;//0.756;
+//float kp3 = 0.45;//0.3;
+//float kd1 = 0.04;//0.04;
+//float kd2 = 0.04;//0.09;
+//float kd3 = 0.055;//0.05;
 // float kp1 = 1.2;
 // float kp2 = 1.2;
 // float kp3 = 1.6;
@@ -75,12 +90,12 @@ char angleString[8];
 // float kd2 = 0.18;
 // float kd3 = 0.1;
 
-float kp1 = 0.4;
-float kp2 = 0.756;
-float kp3 = 0.3;
-float kd1 = 0.04;
-float kd2 = 0.09;
-float kd3 = 0.05;
+//float kp1 = 0.5;//0.4;
+//float kp2 = 0.7566;//0.756;
+//float kp3 = 0.30;//0.3;
+//float kd1 = 0;//0.04;
+//float kd2 = 0;//0.09;
+//float kd3 = 0.08;//0.05;
 //float kp1 = 0.4;
 //float kp2 = 0.8;
 //float kp3 = 0.6;
@@ -99,8 +114,11 @@ uint32_t prevviousmillisbno =0;
 float radiantopwm = 1075.2;
 float rpmtoradian = 9.549;
 float base1multiplier  = 1000;
-float base2multiplier =   1050;
-float base3multiplier = 980;
+float base2multiplier =   1000;
+float base3multiplier = 950;
+//float base1multiplier  = 1000;
+//float base2multiplier =   990;
+//float base3multiplier = 1100;
 float joystickwconstant = 1.2;
 int defaultcontrollerangle = 400;
 float kcasew = 0.9;
@@ -116,10 +134,12 @@ int maxalignmentintegralconstant = 100;
 float alignment_base_w = 0.2;
 float w_limit_for_alignment = 2.0;
 int strength_effective_for_deceleration_acceleration_constant = 30;
-int decleration_acceleration_sampling = 30;
-float acceleration_constant = 0.89;
-float deceleration_constant = 0.90;
+int decleration_acceleration_sampling = 50;
+float acceleration_constant = 0.9;
+float deceleration_constant = 0.95;
 int max_strength_set = 85;
+
+
 
 
 bool Dribble_Ext = false;
@@ -133,7 +153,7 @@ float s=0;
 bool donealign =false;
 float integralalign = 0;
 float w_align = 0;
-float kp_align = 0.0215;
+float kp_align = 0.0225;
 float kd_align = 0.0180;
 float ki_align = 0.0020;
 long previousalignsampling = 0;
@@ -147,7 +167,7 @@ char val[] = "";
 //int rpm1 = 0;
 //int rpm2 = 0;
 //int rpm3 = 0;
-float Z_Val = 0;
+int Z_Val = 0;
 int rotationstrength = 0;
 int strength = 0;
 int strengthc = 0;
@@ -207,11 +227,22 @@ float preverror3 = 0;
 #define pistonUp_Port GPIOD
 #define pistonUp_Pin GPIO_PIN_7
 
-#define pistonDown_Port GPIOB
-#define pistonDown_Pin GPIO_PIN_4
+#define pistonDown_Port GPIOA
+#define pistonDown_Pin GPIO_PIN_10
 
-#define dirPort_d GPIOD
-#define dirPin_d GPIO_PIN_0
+#define dirPort_d GPIOB
+#define dirPin_d GPIO_PIN_7
+
+
+volatile int rpm1 = 0;
+volatile int rpm2 = 0;
+volatile int rpm3 = 0;
+
+
+int prev = 0;
+int prev_loco = 0;
+
+
 
 
 // ROTORS VARIABLES
@@ -242,10 +273,12 @@ int baseLower = 0;
 int baseUpper = 0;
 float ARdistance = 1;
 int a =0;
-bool Rotors_flag = 1;
+bool Rotors_flag = 0;
 bool isthreepointer = true;
-
-
+int RotorsSampling=80;
+int sixtythousand = 60000;
+int ppr=360;
+int Sixhunppr = 600;
 //Autolocomote
 float target_auto = 7;
 float err_auto=0;
@@ -308,14 +341,14 @@ float prev_dis_auto=0;
 
 //picking
 //functions
-void pickup();
+
 
 void dalay(int);
 
 int interval_d = 50;
 
-#define var 1450
-#define madhe 1777
+#define var 2000
+#define madhe 2200
 #define khali 3600
 int integral_d = 0;
 long integral = 0;

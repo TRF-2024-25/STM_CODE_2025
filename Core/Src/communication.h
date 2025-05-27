@@ -20,14 +20,14 @@ int Rxvalueslo(char *Rx_data){
 		char Angle[4];
 		strncpy(Angle, Rx_data +12, 3);
 		angle = atoi(Angle);
-//		angle = (angle == 400) ? 400 : (angle + 180) % 360;
+		angle = (angle == 400) ? 400 : (angle + 180) % 360;
 
 		char Strength[4];
 		strncpy(Strength, Rx_data +15, 3);
 		strengthX = atoi(Strength);
 		 if ((int32_t)HAL_GetTick() - strengthsampling > decleration_acceleration_sampling) {
 			if (strengthX - strengthc >strength_effective_for_deceleration_acceleration_constant) {
-				strengthX -= (strengthX - strengthc) * acceleration_constant;
+				strengthX -= (strengthX - strengthc) * deceleration_constant;
 			 } else if (strengthX - strengthc < -strength_effective_for_deceleration_acceleration_constant) {
 
 				       if((int)(angle - Z_Val ) %360 > 140 && (int)(angle - Z_Val ) %360 < 220)
@@ -38,7 +38,7 @@ int Rxvalueslo(char *Rx_data){
 				       else
 				       {
 
-					   strengthX -= (strengthX - strengthc) * deceleration_constant;
+					   strengthX -= (strengthX - strengthc) *acceleration_constant;
 		 	     }
 			 }
 		  	 strengthc = strengthX;
@@ -60,7 +60,8 @@ int Arvalueslo(char *Ar_data){
    }
 }
 int Mpuvalueslo(char *Mp_data){
-	sscanf(Mp_data,"%f",&Z_Val);
+	sscanf(Mp_data,"%d",&Z_Val);
+//	Z_Val =0;
 }
 
 //int parsegargiar(char *Ar_data){

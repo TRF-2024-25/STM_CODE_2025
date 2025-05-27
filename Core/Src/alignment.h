@@ -62,7 +62,7 @@ bool align(float target) {
     } else {
       w = (s < 0) ? -w_limit_for_alignment : w_limit_for_alignment;
     }
-    w = -w;
+//    w = -w;
     previousalignsampling = HAL_GetTick();
     previousS = s;
   }

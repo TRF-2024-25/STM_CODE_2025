@@ -40,17 +40,6 @@ void locomotion() {
       break;
     case 'L':
 
-      w = (joystickwconstant * rotationstrength) / 100;
-      if (angle == defaultcontrollerangle) {
-        vx = 0;
-        vy = 0;
-        break;
-      } else {
-        calc();
-        break;
-      }
-      break;
-    case 'R':
       w = -(joystickwconstant * rotationstrength) / 100;
       if (angle == defaultcontrollerangle) {
         vx = 0;
@@ -61,13 +50,24 @@ void locomotion() {
         break;
       }
       break;
+    case 'R':
+      w = (joystickwconstant * rotationstrength) / 100;
+      if (angle == defaultcontrollerangle) {
+        vx = 0;
+        vy = 0;
+        break;
+      } else {
+        calc();
+        break;
+      }
+      break;
 
-    case 'k':
+    case 'K':
       w = -kcasew ;
       calc();
 
       break;
-    case 'K':
+    case 'k':
       w = kcasew ;
 
       calc();
@@ -96,6 +96,7 @@ void locomotion() {
 //}
 
 void calc() {
+
   radiann = toradian(angle);
   vx = cos(radiann) * strength / 100 * multi;
   vy = sin(radiann) * strength / 100 * multi;
@@ -109,9 +110,9 @@ void locomote() {
   base[2] = (matrix[2][0] * vx + matrix[2][1] * vy + w * matrix[2][2]) / r;
 
   if ((base[0] != 0) || (base[1] != 0) || base[2] != 0) {
-    dir[0] = (base[0] < 0) ? 0 : 1;
-    dir[1] = (base[1] < 0) ? 1 : 0;
-    dir[2] = (base[2] < 0) ? 0 : 1;
+    dir[0] = (base[0] < 0) ? 1: 0;
+    dir[1] = (base[1] < 0) ? 0:1;
+    dir[2] = (base[2] < 0) ? 0: 1;
   }
   setpoint1 = base[0] *  rpmtoradian;
   setpoint2 = base[1] *  rpmtoradian;
@@ -150,15 +151,30 @@ void locomote() {
     previousmillis = HAL_GetTick();
   }
 
-HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, dir[0]);
+// R1 LOCOMOTION
+HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, dir[1]);
+  TIM2->CCR4 = pwm2;
+
+HAL_GPIO_WritePin(GPIOB,GPIO_PIN_12,dir[0]);
   TIM2->CCR3 = pwm1;
 
-HAL_GPIO_WritePin(GPIOD,GPIO_PIN_11,dir[1]);
-  TIM12->CCR2 = pwm2;
+
+ HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, dir[2]);
+  TIM2->CCR1 = pwm3;
+
+// R2 LOCOMOTION
 
 
- HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, dir[2]);
-  TIM2->CCR4 = pwm3;
+
+//  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_12,dir[1]);
+//  TIM12 ->CCR2 = pwm1;
+//  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_13,dir[0]);
+//   TIM12->CCR1 = pwm2;
+//  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_11,dir[2]);
+//  TIM2 ->CCR3 = pwm3;
+
+
+
 
 }
 

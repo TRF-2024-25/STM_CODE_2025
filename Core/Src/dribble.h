@@ -3,24 +3,18 @@
 
 #include "variables.h"
 #include "stm32f4xx_hal.h"
-int kart;
-//int constrain(int value, int min, int max) {
-//    if (value < min) return min;
-//    else if (value > max) return max;
-//    else return value;
-//}
 
 ADC_HandleTypeDef hadc1;
 uint16_t analogRead_pa4() {
 	ADC_ChannelConfTypeDef sConfig = { 0 };
-	sConfig.Channel = ADC_CHANNEL_4;
+	sConfig.Channel = ADC_CHANNEL_10;
 	sConfig.Rank = 1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, 20);
+	HAL_ADC_PollForConversion(&hadc1, 1000);
 	uint16_t pot = HAL_ADC_GetValue(&hadc1);
 	HAL_ADC_Stop(&hadc1);
 	return pot;
@@ -33,86 +27,67 @@ void dribble() {
 		return;
 	}
 
-	if (fOperation == 1) {
+	if (HAL_GetTick() - prevmillis_d >= 50) {
+		error_d = dribble_sp - temp_pot;
+		(error_d >= 0) ?
+				HAL_GPIO_WritePin(dirPort_d, dirPin_d, 1) :
+				HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
 
-		if (HAL_GetTick() - prevmillis_d >= 50) {
-			error_d = dribble_sp - temp_pot;
-			(error_d >= 0) ?
-					HAL_GPIO_WritePin(dirPort_d, dirPin_d, 1) :
-					HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
-//			kart = abs(error_d);
-			if (abs(error_d) <= 30) {
+		if (abs(error_d) <= 30) {
 
-				TIM2->CCR1 = 0;
-				dalay(500);
-				switch (count) {
-//				case 2:
-////					if (dribble_sp == khali) {
-//					TIM12->CCR1 = 0;
-//					flag_amkette = true;
-//					f_dribble = false;
-//					fOperation = 0;
-//					count = 0;
-//					kpLower = 0.4;
-//					kpUpper = 0.3;
-//					kdLower = 0.02;
-//					kdUpper = 0.02;
-//					Dribble_Ext = false;
-//					break;
-//					}
-				case 2:
-					dribble_sp = var;
-					flag_amkette = true;
-					f_dribble = false;
-					fOperation = 0;
-					count = 0;
-					break;
+			TIM10->CCR1 = 0;
+			dalay(500);
+			switch (count) {
+			case 0:
 
-				case 1:
-					dribble_sp = khali;
-					temp_pot = analogRead_pa4();
-					prev_error_pot = 0;
-					error_d = dribble_sp - temp_pot;
-					count = 2;
+				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
+				dalay(1000);
+				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
+				dribble_sp = madhe;
+				temp_pot = analogRead_pa4();
+				error_d = dribble_sp - temp_pot;
+				count = 1;
+				break;
+			case 1:
+				dribble_sp = khali;
+				temp_pot = analogRead_pa4();
+				prev_error_pot = 0;
+				error_d = dribble_sp - temp_pot;
+				count = 2;
 
-					break;
+				break;
+			case 2:
+				dribble_sp = var;
+				flag_amkette = true;
+				f_dribble = false;
+				fOperation = 0;
+				count = 0;
+				break;
 
-				case 0:
+			default:
 
-//					if (dribble_sp == var) {
-					HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
-					HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
-					dalay(1000);
-					HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
-					HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
-					dribble_sp = madhe;
-					temp_pot = analogRead_pa4();
-					error_d = dribble_sp - temp_pot;
-					count = 1;
-
-					break;
-//					}
-				default:
-					break;
-				}
-
-			} else {
-				error_d = abs(error_d);
-				if (error_d < 100) {
-					integral_d += error_d;
-				} else {
-					integral_d = 0;
-				}
-				pwm_dribble = 12000 + (error_d * kp_d)
-						+ kd_d * (error_d - prev_error_pot) + ki_d * integral_d; // + 0.014 * (error_d - prev_error_pot) + 0.001 * (integral);
-				pwm_dribble = constrain(pwm_dribble, 0, 65535);
-				TIM2->CCR1 = pwm_dribble;
-//        analogWrite(pwmpin_d, pwm_dribble);
+				break;
 			}
-			prevmillis_d = HAL_GetTick();
-			prev_error_pot = error_d;
+
+		} else {
+			error_d = abs(error_d);
+			if (error_d < 100) {
+				integral_d += error_d;
+			} else {
+				integral_d = 0;
+			}
+			pwm_dribble = 12000 + (error_d * kp_d)
+					+ kd_d * (error_d - prev_error_pot) + ki_d * integral_d; // + 0.014 * (error_d - prev_error_pot) + 0.001 * (integral);
+			pwm_dribble = constrain(pwm_dribble, 0, 65535);
+			TIM10->CCR1 = pwm_dribble;
+//        analogWrite(pwmpin_d, pwm_dribble);
 		}
+		prevmillis_d = HAL_GetTick();
+		prev_error_pot = error_d;
 	}
+
 }
 
 // void dribble() {

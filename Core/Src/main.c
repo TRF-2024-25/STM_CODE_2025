@@ -22,8 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "main.h"
-//#include "jsonparsergargi.h"
 #include "bno055_stm32.h"
+//#include "jsonparsergargi.h"
 #include "rotors.h"
 #include "variables.h"
 #include "communication.h"
@@ -63,19 +63,16 @@ TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim8;
 TIM_HandleTypeDef htim9;
-TIM_HandleTypeDef htim11;
+TIM_HandleTypeDef htim10;
 TIM_HandleTypeDef htim12;
 
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
-UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_uart4_rx;
 DMA_HandleTypeDef hdma_uart4_tx;
 DMA_HandleTypeDef hdma_uart5_rx;
 DMA_HandleTypeDef hdma_uart5_tx;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
@@ -87,7 +84,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
@@ -98,9 +94,9 @@ static void MX_TIM9_Init(void);
 static void MX_TIM12_Init(void);
 static void MX_UART4_Init(void);
 static void MX_UART5_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_TIM11_Init(void);
+static void MX_TIM10_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -112,8 +108,7 @@ char rx_buff[21];
 
 float z = 0;
 int u = 0;
-
-
+int yaw = 0;
 //uint32_t prev=0;
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
@@ -127,15 +122,13 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 //	if (huart == &huart2)
 //		HAL_UART_Receive(&huart2, Ar_data, 29,10);
-	if (huart == &huart5){
-		HAL_UART_Receive_DMA(&huart5, Rx_data, 20);
-	}
-	else if (huart == &huart4) {
+	if (huart == &huart5) {
+		HAL_UART_Receive_DMA(&huart5, rx_data, 20);
+	} else if (huart == &huart4) {
 		HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
-	}
-	else if (huart == &huart2) {
+	} else if (huart == &huart2) {
 		HAL_UART_Receive_DMA(&huart2, Ar_data, 29);
-		}
+	}
 
 }
 
@@ -172,7 +165,6 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
-  MX_I2C1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
@@ -183,9 +175,9 @@ int main(void)
   MX_TIM12_Init();
   MX_UART4_Init();
   MX_UART5_Init();
-  MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  MX_TIM11_Init();
+  MX_TIM10_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Encoder_Start_IT(&htim1, TIM_CHANNEL_ALL);
 	HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
@@ -201,6 +193,7 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim9, TIM_CHANNEL_3);
 	HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
 	HAL_UART_Receive_DMA(&huart5, Rx_data, 20);
 	HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
 	HAL_UART_Receive_DMA(&huart2, Ar_data, 29);
@@ -220,16 +213,39 @@ int main(void)
 	HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
 	HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
 	HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 0);
-//	fOperation = 1;
-//	f_dribble = true;
+
+//	dalay(5000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-//		HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
-//		TIM2->CCR1=15000;
+//		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 1);
+//		TIM12->CCR1 =15000;
+//		dalay(2000);
+//		TIM12->CCR1 =0;
+//		dalay(2000);
+//		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 0);
+//		dalay(2000);
+//			TIM12->CCR1 =15000;
+//			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 1);
+//			dalay(2000);
+//			dalay(2000);
+//			TIM12->CCR1 =0;
+//			dalay(2000);
+//			HAL_GPIO_WritePin(pistonUp_Port, pistonUp_Pin, 1);
+//			dalay(1000);
+//			HAL_GPIO_WritePin(pistonUp_Port, pistonUp_Pin, 0);
+//			dalay(1000);
 
+//		dalay(200);
+//		TIM10->CCR1=0;
+//		HAL_GPIO_WritePin(dirPort_d, dirPin_d, 0);
+//				TIM10->CCR1=15000;
+//				dalay(200);
+//				TIM10->CCR1=0;
+//locomote();
+//
 
 //		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, 1);
 //		dalay(1000);
@@ -246,7 +262,7 @@ int main(void)
 //	    v = bno055_getVectorQuaternion();
 //		if (HAL_GetTick() - prevviousmillisbno > 80) {
 //
-//			Z_Val = (int)v.x;
+//			yaw = (int)v.x;
 //			prevviousmillisbno = HAL_GetTick();
 //		}
 		temp_pot = analogRead_pa4();
@@ -257,11 +273,7 @@ int main(void)
 //		parseJSAR(&Ar_data);
 		Mpuvalueslo(&Mp_data);
 		Arvalueslo(&Ar_data);
-		Rxvalueslo(&Rx_data);
-strncpy(oo, Rx_data + 10,12);
-oo[12] = '\0';
-//gg = atoi(oo);
-sscanf(oo, "%d", &gg);
+		Rxvalueslo(&rx_data);
 		dribble();
 		rotors(Rotors_flag);
 
@@ -338,7 +350,7 @@ sscanf(oo, "%d", &gg);
 						autoloco = false;
 					}
 					f_dribble = true;
-					fOperation = 1;
+
 					HAL_GPIO_WritePin(extendLower_Port, extendLower_Pin, 1);
 					dalay(600);
 					HAL_GPIO_WritePin(extendLower_Port, extendLower_Pin, 0);
@@ -346,7 +358,7 @@ sscanf(oo, "%d", &gg);
 					HAL_GPIO_WritePin(extendUpper_Port, extendUpper_Pin, 1);
 					dalay(150);
 					HAL_GPIO_WritePin(extendUpper_Port, extendUpper_Pin, 0);
-					dalay(300);
+					dalay(500);
 				}
 				flag_amkette = false;
 			}
@@ -375,25 +387,25 @@ sscanf(oo, "%d", &gg);
 			kpUpper = 0.6;
 			break;
 
-//  		    case 'J':
-//  		      if (!alignn) {
-//  		        alignn = true;
-//  		      }
-//  		      HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
-//  		      HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
-//  		      dalay(150);
-//  		      HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
-//  		      HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
-//  		      Rpm_set_lower = 0;
-//  		      Rpm_set_upper = 0;
-//  		      Rotors_flag = 0;
-//  		      kdLower = 0;
-//  		      kdUpper = 0;
-//  		      kpLower = 0.0;
-//  		      kpUpper = 0.0;
-//  		      baseLower = 0;
-//  		      baseUpper = 0;
-//  		      break;
+		case 'J':
+			if (!alignn) {
+				alignn = true;
+			}
+			Rotors_flag = 0;
+			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
+			dalay(150);
+			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
+			Rpm_set_lower = 0;
+			Rpm_set_upper = 0;
+			kdLower = 0;
+			kdUpper = 0;
+			kpLower = 0.0;
+			kpUpper = 0.0;
+			baseLower = 0;
+			baseUpper = 0;
+			break;
 		case 'B':
 			if (autoloco) {
 				autoloco = false;
@@ -415,7 +427,7 @@ sscanf(oo, "%d", &gg);
 				if (alpha == 0) {
 					alignvalue = 180;
 				} else {
-					alignvalue = Z_Val + alpha + 6;
+					alignvalue = Z_Val + alpha;
 				}
 				alignn = false;
 				nexts = false;
@@ -425,7 +437,7 @@ sscanf(oo, "%d", &gg);
 
 		case 'L':
 			if (!alignn) {
-					alignn = true;
+				alignn = true;
 			}
 			locomotion();
 			locomote();
@@ -435,18 +447,18 @@ sscanf(oo, "%d", &gg);
 			locomotion();
 			locomote();
 			break;
-		case 'J':
-//			if (autoloco) {
-//				autoloco = false;
-//			}
-			Rotors_flag = 0;
-			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
-			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
-			HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 1);
-			dalay(200);
-			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
-			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
-			HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 0);
+//		case 'J':
+////			if (autoloco) {
+////				autoloco = false;
+////			}
+//			Rotors_flag = 0;
+//			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+//			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
+//			HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 1);
+//			dalay(200);
+//			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+//			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
+//			HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 0);
 			break;
 
 		default:
@@ -526,7 +538,7 @@ sscanf(oo, "%d", &gg);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	}
+	}//hereup
   /* USER CODE END 3 */
 }
 
@@ -599,14 +611,13 @@ static void MX_ADC1_Init(void)
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.DiscontinuousConvMode = ENABLE;
-  hadc1.Init.NbrOfDiscConversion = 1;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 8;
+  hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -618,70 +629,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_5;
-  sConfig.Rank = 2;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_10;
-  sConfig.Rank = 3;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_11;
-  sConfig.Rank = 4;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_12;
-  sConfig.Rank = 5;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_13;
-  sConfig.Rank = 6;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_14;
-  sConfig.Rank = 7;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_15;
-  sConfig.Rank = 8;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -865,11 +813,11 @@ static void MX_TIM3_Init(void)
   sConfig.IC1Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC1Filter = 10;
+  sConfig.IC1Filter = 0;
   sConfig.IC2Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC2Filter = 10;
+  sConfig.IC2Filter = 0;
   if (HAL_TIM_Encoder_Init(&htim3, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -1081,33 +1029,33 @@ static void MX_TIM9_Init(void)
 }
 
 /**
-  * @brief TIM11 Initialization Function
+  * @brief TIM10 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_TIM11_Init(void)
+static void MX_TIM10_Init(void)
 {
 
-  /* USER CODE BEGIN TIM11_Init 0 */
+  /* USER CODE BEGIN TIM10_Init 0 */
 
-  /* USER CODE END TIM11_Init 0 */
+  /* USER CODE END TIM10_Init 0 */
 
   TIM_OC_InitTypeDef sConfigOC = {0};
 
-  /* USER CODE BEGIN TIM11_Init 1 */
+  /* USER CODE BEGIN TIM10_Init 1 */
 
-  /* USER CODE END TIM11_Init 1 */
-  htim11.Instance = TIM11;
-  htim11.Init.Prescaler = 0;
-  htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim11.Init.Period = 65535;
-  htim11.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim11.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim11) != HAL_OK)
+  /* USER CODE END TIM10_Init 1 */
+  htim10.Instance = TIM10;
+  htim10.Init.Prescaler = 0;
+  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim10.Init.Period = 65535;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
   {
     Error_Handler();
   }
-  if (HAL_TIM_PWM_Init(&htim11) != HAL_OK)
+  if (HAL_TIM_PWM_Init(&htim10) != HAL_OK)
   {
     Error_Handler();
   }
@@ -1115,14 +1063,14 @@ static void MX_TIM11_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim11, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM11_Init 2 */
+  /* USER CODE BEGIN TIM10_Init 2 */
 
-  /* USER CODE END TIM11_Init 2 */
-  HAL_TIM_MspPostInit(&htim11);
+  /* USER CODE END TIM10_Init 2 */
+  HAL_TIM_MspPostInit(&htim10);
 
 }
 
@@ -1239,39 +1187,6 @@ static void MX_UART5_Init(void)
 }
 
 /**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART1_Init 0 */
-
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -1311,7 +1226,6 @@ static void MX_DMA_Init(void)
 {
 
   /* DMA controller clock enable */
-  __HAL_RCC_DMA2_CLK_ENABLE();
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
@@ -1333,12 +1247,6 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
-  /* DMA2_Stream2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-  /* DMA2_Stream7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 
 }
 
@@ -1361,39 +1269,39 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2|GPIO_PIN_4|GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2|GPIO_PIN_4|GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_4, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_4|GPIO_PIN_7, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11|GPIO_PIN_15|GPIO_PIN_0|GPIO_PIN_1
-                          |GPIO_PIN_3|GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11|GPIO_PIN_14|GPIO_PIN_15|GPIO_PIN_0
+                          |GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_7, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8|GPIO_PIN_10, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PE2 PE4 PE0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_4|GPIO_PIN_0;
+  /*Configure GPIO pins : PE2 PE4 PE0 PE1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_4|GPIO_PIN_0|GPIO_PIN_1;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB12 PB13 PB4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_4;
+  /*Configure GPIO pins : PB12 PB13 PB4 PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_4|GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD11 PD15 PD0 PD1
-                           PD3 PD7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_15|GPIO_PIN_0|GPIO_PIN_1
-                          |GPIO_PIN_3|GPIO_PIN_7;
+  /*Configure GPIO pins : PD11 PD14 PD15 PD0
+                           PD1 PD3 PD7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_14|GPIO_PIN_15|GPIO_PIN_0
+                          |GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -1406,8 +1314,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  /*Configure GPIO pins : PA8 PA10 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
