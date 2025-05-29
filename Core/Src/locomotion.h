@@ -16,8 +16,9 @@ double toradian(double x) {
 
 void locomotion() {
   if (!alignn) {
+	  fromlocomotion = false;
     alignn = align(alignvalue);
-    fromlocomotion = false;
+
   }
 
   switch (loco) {
@@ -74,18 +75,18 @@ void locomotion() {
       calc();
 
       break;
-    case 'o':
-      w = ocasew;
-
-      calc();
-
-      break;
-    case 'O':
-      w = -ocasew;
-
-      calc();
-
-      break;
+//    case 'o':
+//      w = ocasew;
+//
+//      calc();
+//
+//      break;
+//    case 'O':
+//      w = -ocasew;
+//
+//      calc();
+//
+//      break;
 
     default:
       if (alignn) {
@@ -105,9 +106,8 @@ void calc() {
 void locomote() {
 
  if (HAL_GetTick() - previousmillis >= sampletime) {
-
-
-	  if(w!=0){
+      rpm_cal();
+	  if(w!=0 || !bnoallow || !alignn){
 		  bnosetpoint = Z_Val;
 		  bnoerror =0;
 		  fromlocomotion = false;
@@ -115,13 +115,21 @@ void locomote() {
 	  }
 	  else if(prevw < 0.1 && prevw > -0.1){
 		  prevw =0;
+		  if(Rotors_flag == 0){
 		 fromlocomotion = true;
-		 align(bnosetpoint);
+		 align(bnosetpoint);}
+		  else{
+			  fromlocomotion = false;
+		  }
 	  }
 	  else{
+		  if(bnoallow){
 		  bnosetpoint = Z_Val;
-		  prevw = prevw*0.9;
-		  w = prevw;
+		  prevw = prevw*0.8;
+		  w = prevw;}
+		  else{
+			  bnosetpoint = Z_Val;
+		  }
 	  }
   float matrix[3][3] = { { cos((0 + Z_Val) * pi / 180), sin((0 + Z_Val) * pi / 180), d },
                          { cos((120 + Z_Val) * pi / 180), sin((120 + Z_Val) * pi / 180), d },

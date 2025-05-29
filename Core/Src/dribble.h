@@ -68,11 +68,11 @@ void dribble() {
 				flag_amkette = true;
 				f_dribble = false;
 				count = 0;
-				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+//				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
 				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
 				HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 1);
 				while_delay(200);
-				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+//				HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
 				HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
 				HAL_GPIO_WritePin(pistonDown_Port, pistonDown_Pin, 0);
 				break;

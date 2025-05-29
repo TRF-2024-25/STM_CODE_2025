@@ -51,12 +51,11 @@ void absolute(int *value) {
 }
 
 void dis_cal() {
-
 	// if (ARdistance > 0.0) {
 //	ARdistance =5;
-	Rpm_set_lower =3200;//(isthreepointer) ?abs((int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)):2900;//(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100 ) :2900;
+	Rpm_set_lower =3150;//(isthreepointer) ?abs((int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)):2900;//(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100 ) :2900;
 	Rpm_set_lower = constrain(Rpm_set_lower, 0, 3200);
-	Rpm_set_upper =2620;//(isthreepointer) ?abs((int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)):900;//(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150 ) :900;
+	Rpm_set_upper =2550;//(isthreepointer) ?abs((int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)):900;//(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150 ) :900;
 	Rpm_set_upper = constrain(Rpm_set_upper, 0, 3200);
 	baseLower = 17.2*Rpm_set_lower + 4088.9-1000;
 	baseUpper = 16.877*Rpm_set_upper + 5313.2-1000;
@@ -120,7 +119,7 @@ void feed() {
 
 void rpm_cal() {
 
-	if (HAL_GetTick() - prev_loco >= RotorsSampling) {
+//	if (HAL_GetTick() - prev_loco >= RotorsSampling) {
 
 		counter_4 = TIM1->CNT;
 		counter_5 = TIM3->CNT;
@@ -148,7 +147,7 @@ void rpm_cal() {
 //		__HAL_TIM_SET_COUNTER(&htim8, 0);
 		__HAL_TIM_SET_COUNTER(&htim5, 0);
 
-	}
+//	}
 }
 
 #endif /* INC_ROTORS_H_ */

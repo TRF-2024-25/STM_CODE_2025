@@ -1,3 +1,4 @@
+
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
@@ -125,9 +126,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart == &huart5) {
 		HAL_UART_Receive_DMA(&huart5, rx_data, 20);
 	} else if (huart == &huart4) {
-		HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
+		HAL_UART_Receive_DMA(&huart4, Ar_data, 39);
 	} else if (huart == &huart2) {
-		HAL_UART_Receive_DMA(&huart2, Ar_data, 29);
+		HAL_UART_Receive_DMA(&huart2, rx_data, 20);
 	}
 
 }
@@ -195,9 +196,9 @@ int main(void) {
 	HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
-	HAL_UART_Receive_DMA(&huart5, Rx_data, 20);
-	HAL_UART_Receive_DMA(&huart4, Mp_data, 3);
-	HAL_UART_Receive_DMA(&huart2, Ar_data, 29);
+//	HAL_UART_Receive_DMA(&huart5, Rx_data, 20);
+	HAL_UART_Receive_DMA(&huart4, Ar_data, 39);
+	HAL_UART_Receive_DMA(&huart2, rx_data, 20);
 
 //	bno055_assignI2C(&hi2c1);
 //	bno055_setup();
@@ -278,7 +279,7 @@ int main(void) {
 		dribble();
 		rotors(Rotors_flag);
 
-		rpm_cal();
+//		rpm_cal();
 //		autolocomote();
 		switch (loco) {
 		case 'k':
@@ -309,8 +310,9 @@ int main(void) {
 //				break;
 		case 'o':
 			if (!alignn) {
-				alignn = true;
-			}
+						alignn = true;
+					}
+		    bnoallow = 0;
 //			if (autoloco) {
 //				autoloco = false;
 //			}
@@ -321,6 +323,7 @@ int main(void) {
 			if (!alignn) {
 				alignn = true;
 			}
+		    bnoallow = 1;
 //			if (autoloco) {
 //				autoloco = false;
 //			}
@@ -385,39 +388,39 @@ int main(void) {
 //			kpUpper = 0.6;
 //			break;
 //
-		case 'U':
-			if (!alignn) {
-				alignn = true;
-			}
-			Rotors_flag = 0;
-//			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
-			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
-			while_delay(150);
-//			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
-			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
-			Rpm_set_lower = 0;
-			Rpm_set_upper = 0;
-			kpLower = 0.0;
-			kpUpper = 0.0;
-			baseLower = 0;
-			baseUpper = 0;
-			break;
-		case 'g':
-
-			//			if (nexts) {
-			//				g_case ++;
-			//				if (alpha == 0) {
-			alignvalue = 360;
-			//				} else {
-			//					alignvalue = Z_Val + alpha;
-			//				}
-			alignn = false;
-			//				nexts = false;
-			//			}
-			locomotion();
-			locomote();
-
-			break;
+//		case 'U':
+//			if (!alignn) {
+//				alignn = true;
+//			}
+//			Rotors_flag = 0;
+////			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 1);
+//			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 1);
+//			while_delay(150);
+////			HAL_GPIO_WritePin(retractLower_Port, retractLower_Pin, 0);
+//			HAL_GPIO_WritePin(retractUpper_Port, retractUpper_Pin, 0);
+//			Rpm_set_lower = 0;
+//			Rpm_set_upper = 0;
+//			kpLower = 0.0;
+//			kpUpper = 0.0;
+//			baseLower = 0;
+//			baseUpper = 0;
+//			break;
+//		case 'g':
+//
+//			if (nexts) {
+//
+//			if (alpha == 0) {
+//			alignvalue = 180;
+//			} else {
+//			alignvalue = Z_Val + alpha;
+//			}
+//			alignn = false;
+//			nexts = false;
+//						}
+//			locomotion();
+//			locomote();
+//
+//			break;
 		case 'J':
 			//			if (flag_amkette == true) {
 			//				if (nexts) {
@@ -487,16 +490,16 @@ int main(void) {
 			locomote();
 
 			break;
-//		case 'g':
-//			if (nexts) {
-//				if (alpha == 0) {
-//					alignvalue = 180;
-//				} else {
-//					alignvalue = Z_Val + alpha;
-//				}
-//				alignn = false;
-//				nexts = false;
-//			}
+		case 'g':
+			if (nexts) {
+				if (alpha == 0) {
+					alignvalue = 180;
+				} else {
+					alignvalue = Z_Val + alpha;
+				}
+				alignn = false;
+				nexts = false;
+			}
 
 			break;
 

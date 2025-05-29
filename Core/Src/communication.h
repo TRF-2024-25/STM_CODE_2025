@@ -27,11 +27,27 @@ void Rxvalueslo(char *Rx_data){
 		 if ((int32_t)HAL_GetTick() - strengthsampling > decleration_acceleration_sampling) {
 				strengthX = atoi(Strength);
 			if (strengthX - strengthc >  strength_effective_for_deceleration_acceleration_constant) {
-				strengthX -= (strengthX - strengthc) *acceleration_constant   ;
+//				strengthX -= (strengthX - strengthc) *acceleration_constant   ;
+				if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
+					strengthX = strengthc + 1.5;
+				}
+				strengthX  = strengthc + 3.5;
+				if(prevangle != angle && angle != 400){
+								angle = prevangle + (angle - prevangle)*0.04;
+					}
+
+
 
 			 } else if (strengthX - strengthc < - (strength_effective_for_deceleration_acceleration_constant)) {
-					   strengthX -= (strengthX - strengthc) *deceleration_constant;
+//					   strengthX -= (strengthX - strengthc)  *deceleration_constant;
+				 if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
+				 					strengthX = strengthc - 2.5;
+				 				}
+				       strengthX = strengthc - 4.5;
 						a++;
+				       if(prevangle != angle && angle != 400){
+				    	   angle = prevangle + (angle - prevangle)*0.04;
+				       }
 			 }
 		  	        strengthc = strengthX;
 				   	strength = strengthX;
@@ -49,12 +65,18 @@ void Arvalueslo(char *Ar_data){
    if(Ar_data!= NULL){
 	   strncpy(disString,Ar_data +6,7);
 	   strncpy(angleString,Ar_data + 20,7);
+           strncpy(Mp_data,Ar_data +34,3);
 	   sscanf(disString,"%f",&ARdistance);
 	   sscanf(angleString,"%f",&alpha);
+           sscanf(Mp_data,"%d",&Z_Val);
    }
 }
 void Mpuvalueslo(char *Mp_data){
 	sscanf(Mp_data,"%d",&Z_Val);
+	if(Z_Val > 360){
+		Z_Val =0;
+		bnoallow = false;
+	}
 }
 
 //int parsegargiar(char *Ar_data){

@@ -14,7 +14,7 @@
 #include "string.h"
 
 char Rx_data[20];
-char Ar_data[29];
+char Ar_data[39];
 char Mp_data[3];
 char rx_data[20]={'{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}'};
 bool f_h = true;
@@ -72,12 +72,12 @@ char angleString[8];
 //kartik
 float kp1 = 0.5;//0.14
 float kp2 = 0.65;// 0.31
-float kp3 = 0.55;//0.4
+float kp3 = 0.45;//0.4
 
 float kd1 = 0.04;//0.0
 float kd2 = 0.05;// 0.024
 float kd3 = 0.03;// 0.02
-
+bool bnoallow = 1;
 //float kp1 = 0.5;//0.4;
 //float kp2 = 0.45;//0.756;
 //float kp3 = 0.45;//0.3;
@@ -119,7 +119,7 @@ uint32_t prevviousmillisbno =0;
 float radiantopwm = 1075.2;
 float rpmtoradian = 9.549;
 float base1multiplier  = 1000;
-float base2multiplier =   1000;
+float base2multiplier =   1030;
 float base3multiplier = 960;
 //float base1multiplier  = 1000;
 //float base2multiplier =   990;

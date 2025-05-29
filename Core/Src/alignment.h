@@ -4,10 +4,10 @@
 bool align(float target) {
 
   float delta = target - Z_Val;
-  if (delta > 180) {
+  if (delta >= 180) {
     delta = delta - 360;
   }
-  if (delta < -180) {
+  if (delta <= -180) {
     delta = delta + 360;
   }
   if (initialdelta == 0) {
@@ -16,7 +16,7 @@ bool align(float target) {
 
 
   s = delta;
-  alignmentsetpoint = (fromlocomotion)?5:2;
+  alignmentsetpoint = (fromlocomotion)?3:2;
   if(fromlocomotion){
 	  if(delta < alignmentsetpoint && delta > -alignmentsetpoint){
 		  donealign = true;
@@ -24,17 +24,17 @@ bool align(float target) {
   }
   else{
   if (initialdelta < 0) {
-    if (delta > -nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier && delta < nextanglesetpointalignmentconstant) {
+    if (delta >= -nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier && delta <= nextanglesetpointalignmentconstant) {
       donealign = true;
     }
   } else {
-    if (delta > -nextanglesetpointalignmentconstant && delta < nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier) {
+    if (delta >= -nextanglesetpointalignmentconstant && delta <= nextanglesetpointalignmentconstant + initialdelta*alignmentinitialdeltamultiplier) {
       donealign = true;
     }
   }
   }
   if (donealign) {
-	if(delta < alignmentsetpoint && delta >-alignmentsetpoint){
+	if(delta <= alignmentsetpoint && delta >=-alignmentsetpoint){
     w = 0;
     alignn = true;
     integralalign = 0;
