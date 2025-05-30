@@ -12,7 +12,9 @@
 double toradian(double x) {
   return x * pi / 180;
 }
-
+double toangle(double radian){
+  return radian*180/pi;
+}
 
 void locomotion() {
   if (!alignn) {
@@ -148,7 +150,7 @@ void locomote() {
 //  bno3pid = basepwm[2] + kp3 * (error3) + kd3 * (error3 - preverror1) - (kpbno3 * (bnoerror) + kdbno3*(bnoerror -previousbnoerror));
     dir[0] = base[0] < 0 ?  0: 1;
     dir[1] = base[1] <0  ? 1: 0;
-    dir[2] =  base[2 ]<0 ? 1: 0;
+    dir[2] =  base[2]<0 ? 1: 0;
 
   setpoint1 = base[0] *  rpmtoradian;
   setpoint2 = base[1] *  rpmtoradian;

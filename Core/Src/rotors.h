@@ -53,9 +53,9 @@ void absolute(int *value) {
 void dis_cal() {
 	// if (ARdistance > 0.0) {
 //	ARdistance =5;
-	Rpm_set_lower =3150;//(isthreepointer) ?abs((int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)):2900;//(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100 ) :2900;
+	Rpm_set_lower =3200;//(isthreepointer) ?abs((int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)):2900;//(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100)<0? (~(int)(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100) +1):(24.073 * ARdistance * ARdistance- 292.51 * ARdistance + 3998.4+100 ) :2900;
 	Rpm_set_lower = constrain(Rpm_set_lower, 0, 3200);
-	Rpm_set_upper =2550;//(isthreepointer) ?abs((int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)):900;//(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150 ) :900;
+	Rpm_set_upper =1800;//(isthreepointer) ?abs((int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)):900;//(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150)<0? (~(int)(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150) +1):(-104.35 * ARdistance * ARdistance+ 1431.2 * ARdistance - 2596.8+150 ) :900;
 	Rpm_set_upper = constrain(Rpm_set_upper, 0, 3200);
 	baseLower = 17.2*Rpm_set_lower + 4088.9-1000;
 	baseUpper = 16.877*Rpm_set_upper + 5313.2-1000;
@@ -140,6 +140,19 @@ void rpm_cal() {
 		rpm2 = (rpm2<0)?(~rpm2) +1: rpm2;
 		rpm3 = (rpm3<0)?(~rpm3)+1:rpm3;
 //			  rotors();
+                sprintf(rpm1s,"%03d",rpm1);
+                sprintf(rpm2s,"%03d",rpm2);
+                sprintf(rpm3s,"%03d",rpm3);
+                sendbuffer[0] = rpm1s[0];
+                sendbuffer[1] = rpm1s[1];
+                sendbuffer[2] = rpm1s[2];
+                sendbuffer[3] = rpm2s[0];
+                sendbuffer[4] = rpm2s[1];
+                sendbuffer[5] = rpm2s[2];
+                sendbuffer[6] = rpm3s[0];
+                sendbuffer[7] = rpm3s[1];
+                sendbuffer[8] = rpm3s[2];
+                sendbuffer[9] =  '*';
 
 		prev_loco = HAL_GetTick();
 		__HAL_TIM_SET_COUNTER(&htim1, 0);

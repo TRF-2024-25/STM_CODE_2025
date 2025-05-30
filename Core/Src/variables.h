@@ -12,11 +12,14 @@
 #include "stdio.h"
 #include <stdbool.h>
 #include "string.h"
-
+char sendbuffer[10];
 char Rx_data[20];
 char Ar_data[39];
 char Mp_data[3];
 char rx_data[20]={'{','"','L','O','C','"',':','"','S','0','0','0','4','0','0','0','0','0','"','}'};
+char rpm1s[4];
+char rpm2s[4];
+char rpm3s[4];
 bool f_h = true;
 bool f_H = true;
 // Loco = "S000090100";
@@ -28,6 +31,7 @@ void recievecmd();
 void encoders();
 void pickup();
 void powerWindow();
+
 // bool sp_reached = false;
 // bool f_power = false;
 // int count = 0;
@@ -66,6 +70,7 @@ bool dirchanged1_flag = false;
 bool dirchanged2_flag = false;
 bool dirchanged3_flag = false;
 bool isauto = false;
+bool difference_big_for_acceleration = false;
 //const char*
 char disString[8];
 char angleString[8];
@@ -304,8 +309,9 @@ void while_delay(int);
 
 #define var 1180
 #define madhe 1300
-#define khali 2900
+#define khali 2950
 int integral_d = 0;
+unsigned long timeout_d = 0;
 unsigned long prevmillis_d = 0;
 int check=0;
 int count = -1;

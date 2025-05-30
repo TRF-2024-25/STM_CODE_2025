@@ -7,58 +7,83 @@
 
 #ifndef SRC_COMMUNICATION_H_
 #define SRC_COMMUNICATION_H_
-
+#include "locomotion.h"
 #include "variables.h"
 #include "cJSON.h"
 void Rxvalueslo(char *Rx_data){
+  loco = Rx_data[8];
+  char Rotate[4];
+  strncpy(Rotate, Rx_data +9, 3);
+  rotationstrength = atoi(Rotate);
+  char Angle[4];
+  strncpy(Angle, Rx_data +12, 3);
 
-        loco = Rx_data[8];
-        char Rotate[4];
-        strncpy(Rotate, Rx_data +9, 3);
-		rotationstrength = atoi(Rotate);
-		char Angle[4];
-		strncpy(Angle, Rx_data +12, 3);
-		angle = atoi(Angle);
-//		angle = (angle == 400) ? 400 : (angle + 180) % 360;
+  //angle = (angle == 400) ? 400 : (angle + 180) % 360;
+  char Strength[4];
+  strncpy(Strength, Rx_data +15, 3);
+  if ((int32_t)HAL_GetTick() - strengthsampling > decleration_acceleration_sampling) {
+      angle = atoi(Angle);
+        if(angle == 400){
+            angle = prevangle;
+        }
+      strengthX = atoi(Strength);
+      absstrengthdifferencebig(prevangle,angle,strengthX,strengthc);
+      if(difference_big_for_acceleration){
+	  calculatenextstrength(prevangle,&angle,&strengthX,strengthc);
+      }
 
-		char Strength[4];
-		strncpy(Strength, Rx_data +15, 3);
+//      if (strengthX - strengthc >  strength_effective_for_deceleration_acceleration_constant) {
+////  		strengthX -= (strengthX - strengthc) *acceleration_constant   ;
+////		if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
+////			strengthX = strengthc + 1.5;
+////		}
+//	  strengthX  = strengthc + 2.5;
+//	  if(prevangle != angle && angle != 400){
+//	      angle = prevangle + (angle - prevangle)*0.04;
+//	  }
+//
+//      } else if (strengthX - strengthc < - (strength_effective_for_deceleration_acceleration_constant)) {
+//	  //  	strengthX -= (strengthX - strengthc)  *deceleration_constant;
+////		if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
+////			strengthX = strengthc - 2.5;
+////		}
+//	  strengthX = strengthc - 3.5;
+//	  if(prevangle != angle && angle != 400){
+//	      angle = prevangle + (angle - prevangle)*0.04;
+//	  }
+//      }
+      strengthc = strengthX;
+      strength = strengthX;
+      prevangle = angle;
+      strengthsampling = HAL_GetTick();
+  }
+  strength  = constrain(strength,0,max_strength_set);
+}
 
-		 if ((int32_t)HAL_GetTick() - strengthsampling > decleration_acceleration_sampling) {
-				strengthX = atoi(Strength);
-			if (strengthX - strengthc >  strength_effective_for_deceleration_acceleration_constant) {
-//				strengthX -= (strengthX - strengthc) *acceleration_constant   ;
-				if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
-					strengthX = strengthc + 1.5;
-				}
-				strengthX  = strengthc + 3.5;
-				if(prevangle != angle && angle != 400){
-								angle = prevangle + (angle - prevangle)*0.04;
-					}
+void calculatenextstrength(int prevangle, int *angle, int *strengthX, int strengthc){
+  float strengthXx = *strengthX*cos(toradian(*angle));
+  float strengthXy = *strengthX*sin(toradian(*angle));
+  float strengthcx = strengthc*cos(toradian(prevangle));
+  float strengthcy = strengthc*sin(toradian(prevangle));
+  strengthXx = strengthcx + (strengthXx - strengthcx)*0.05;
+  strengthXy = strengthcy + (strengthXy - strengthcy)*0.05;
+  *strengthX = sqrt(strengthXx*strengthXx + strengthXy*strengthXy);
+  *angle = toangle(atan2(strengthXy,strengthXx));
+}
 
+void absstrengthdifferencebig(int prevangle ,int angle,int strengthX,int strengthc){
+    float strengthXx = strengthX*cos(toradian(angle));
+    float strengthXy = strengthX*sin(toradian(angle));
+    float strengthcx = strengthc*cos(toradian(prevangle));
+    float strengthcy = strengthc*sin(toradian(prevangle));
+    float distance = sqrt((strengthcx - strengthXx)*(strengthcx - strengthXx) + (strengthcy - strengthXy)*(strengthcy - strengthXy));
+    if(distance>30){
+	difference_big_for_acceleration = true;
+    }
+    else{
+    difference_big_for_acceleration = false;
+    }
 
-
-			 } else if (strengthX - strengthc < - (strength_effective_for_deceleration_acceleration_constant)) {
-//					   strengthX -= (strengthX - strengthc)  *deceleration_constant;
-				 if((angle - Z_Val)%360 > 220 && (angle - Z_Val) < 320){
-				 					strengthX = strengthc - 2.5;
-				 				}
-				       strengthX = strengthc - 4.5;
-						a++;
-				       if(prevangle != angle && angle != 400){
-				    	   angle = prevangle + (angle - prevangle)*0.04;
-				       }
-			 }
-		  	        strengthc = strengthX;
-				   	strength = strengthX;
-					strengthsampling = HAL_GetTick();
-		}
-		strength  = constrain(strength,0,max_strength_set);
-
-
-
-
-//	}
 }
 
 void Arvalueslo(char *Ar_data){
@@ -69,15 +94,21 @@ void Arvalueslo(char *Ar_data){
 	   sscanf(disString,"%f",&ARdistance);
 	   sscanf(angleString,"%f",&alpha);
            sscanf(Mp_data,"%d",&Z_Val);
+           if(Z_Val >= 358 && Z_Val <= 2){
+               HAL_GPIO_WritePin(GPIOB,GPIO_PIN_1,0);
+           }
+           else{
+               HAL_GPIO_WritePin(GPIOB,GPIO_PIN_1,1);
+           }
    }
 }
-void Mpuvalueslo(char *Mp_data){
-	sscanf(Mp_data,"%d",&Z_Val);
-	if(Z_Val > 360){
-		Z_Val =0;
-		bnoallow = false;
-	}
-}
+//void Mpuvalueslo(char *Mp_data){
+//	sscanf(Mp_data,"%d",&Z_Val);
+//	if(Z_Val > 360){
+//		Z_Val =0;
+//		bnoallow = false;
+//	}
+//}
 
 //int parsegargiar(char *Ar_data){
 //	value *rootar = parse_json(Ar_data);
